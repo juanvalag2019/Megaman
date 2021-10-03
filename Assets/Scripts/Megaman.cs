@@ -12,16 +12,23 @@ public class Megaman : MonoBehaviour
     [SerializeField] Sprite fallingSprite;
     [SerializeField] Rigidbody2D myBody;
     [SerializeField] float jumpSpeed;
+    [SerializeField] GameObject bullet;
+
+    [SerializeField] float fireInterval = 2;
+    float nextFireAt, tamX, tamY;
+    bool lastDirection = true;
 
     SpriteRenderer myRenderer;
     BoxCollider2D myCollider;
-
+    float layerTime = 2;
     void Start()
     {
         myAnimator = GetComponent<Animator>();
         myRenderer = GetComponent<SpriteRenderer>();
         myBody = GetComponent<Rigidbody2D>();
         myCollider = GetComponent<BoxCollider2D>();
+        tamX = (GetComponent<SpriteRenderer>()).bounds.size.x;
+        tamY = (GetComponent<SpriteRenderer>()).bounds.size.y;
     }
 
     // Update is called once per frame
@@ -35,13 +42,24 @@ public class Megaman : MonoBehaviour
 
     void Fire()
     {
-        if (Input.GetKey(KeyCode.X))
+
+        if (Input.GetKeyDown(KeyCode.X) && Time.time >= nextFireAt)
         {
             myAnimator.SetLayerWeight(1, 1);
+            layerTime = 5;
+            Vector3 spawnPos = transform.position + new Vector3(lastDirection ? tamX / 2 : -tamX / 2, +0.08f, 0);
+            GameObject bullet = Instantiate(this.bullet, spawnPos, transform.rotation);
+            bullet.GetComponent<BulletMegaman>().direction = lastDirection;
+            nextFireAt += fireInterval;
         }
         else
         {
-            myAnimator.SetLayerWeight(1, 0);
+            layerTime -= 0.5f * Time.deltaTime;
+            if (layerTime <= 0)
+            {
+                myAnimator.SetLayerWeight(1, 0);
+                layerTime = 2;
+            }
         }
     }
 
@@ -51,6 +69,7 @@ public class Megaman : MonoBehaviour
         if (mov != 0)
         {
             myAnimator.SetBool("running", true);
+            lastDirection = mov > 0;
             transform.localScale = new Vector2(Mathf.Sign(mov), 1);
             transform.Translate(new Vector2(mov * speed * Time.deltaTime, 0));
         }
