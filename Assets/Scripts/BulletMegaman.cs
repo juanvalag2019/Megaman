@@ -16,19 +16,20 @@ public class BulletMegaman : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (direction)
-            transform.Translate(new Vector2(speed * Time.deltaTime, 0));
-        else
-            transform.Translate(new Vector2(-speed * Time.deltaTime, 0));
+        if (!myAnimator.GetBool("explode"))
+        {
+            if (direction)
+                transform.Translate(new Vector2(speed * Time.deltaTime, 0));
+            else
+                transform.Translate(new Vector2(-speed * Time.deltaTime, 0));
+        }
 
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Bullet"))
-        {
-            myAnimator.SetBool("explode", true);
-        }
+        Debug.Log(LayerMask.LayerToName(collision.gameObject.layer));
+        myAnimator.SetBool("explode", true);
     }
 
     void Destroy()
