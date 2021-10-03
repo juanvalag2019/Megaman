@@ -12,9 +12,15 @@ public class Megaman : MonoBehaviour
     [SerializeField] Sprite fallingSprite;
     [SerializeField] Rigidbody2D myBody;
     [SerializeField] float jumpSpeed;
+    [SerializeField] GameObject bullet;
+
+    [SerializeField] float fireInterval = 2;
+    float nextFireAt, tamX, tamY;
+    bool lastDirection = true;
 
     SpriteRenderer myRenderer;
     BoxCollider2D myCollider;
+    float layerTime = 2;
     int jump;
     float dash;
     bool pressZ;
@@ -27,6 +33,8 @@ public class Megaman : MonoBehaviour
         myCollider = GetComponent<BoxCollider2D>();
         dash = 0;
         pressZ = true;
+        tamX = (GetComponent<SpriteRenderer>()).bounds.size.x;
+        tamY = (GetComponent<SpriteRenderer>()).bounds.size.y;
     }
 
     // Update is called once per frame
@@ -41,13 +49,24 @@ public class Megaman : MonoBehaviour
 
     void Fire()
     {
-        if (Input.GetKey(KeyCode.X))
+
+        if (Input.GetKeyDown(KeyCode.X) && Time.time >= nextFireAt)
         {
             myAnimator.SetLayerWeight(1, 1);
+            layerTime = 5;
+            Vector3 spawnPos = transform.position + new Vector3(lastDirection ? tamX / 2 : -tamX / 2, +0.08f, 0);
+            GameObject bullet = Instantiate(this.bullet, spawnPos, transform.rotation);
+            bullet.GetComponent<BulletMegaman>().direction = lastDirection;
+            nextFireAt += fireInterval;
         }
         else
         {
-            myAnimator.SetLayerWeight(1, 0);
+            layerTime -= 0.5f * Time.deltaTime;
+            if (layerTime <= 0)
+            {
+                myAnimator.SetLayerWeight(1, 0);
+                layerTime = 2;
+            }
         }
     }
 
@@ -57,18 +76,19 @@ public class Megaman : MonoBehaviour
         if (mov != 0)
         {
             myAnimator.SetBool("running", true);
+            lastDirection = mov > 0;
             transform.localScale = new Vector2(Mathf.Sign(mov), 1);
             transform.Translate(new Vector2(mov * speed * Time.deltaTime, 0));
         }
         else
         {
             myAnimator.SetBool("running", false);
-            
+
         }
     }
     void Saltar()
     {
-        
+
         /*
         si no usaramos animaciones:
         if (isGrounded)
@@ -96,10 +116,12 @@ public class Megaman : MonoBehaviour
                 }
                 jump = 1;
             }
-            
+
         }
-        if(myAnimator.GetBool("jumping") && !isGrounded()){
-            if(myAnimator.GetBool("jumping") && jump == 1 && Input.GetKeyDown(KeyCode.Space)){
+        if (myAnimator.GetBool("jumping") && !isGrounded())
+        {
+            if (myAnimator.GetBool("jumping") && jump == 1 && Input.GetKeyDown(KeyCode.Space))
+            {
                 myAnimator.SetTrigger("takeof");
                 myAnimator.SetBool("jumping", true);
                 myBody.AddForce(new Vector2(0, jumpSpeed), ForceMode2D.Impulse);
@@ -135,7 +157,12 @@ public class Megaman : MonoBehaviour
 
         if (Input.GetKey(KeyCode.Z) && dash <= 0.3 && pressZ == true){            
             myAnimator.SetBool("dash", true);
-            transform.Translate(new Vector2(speed * Time.deltaTime, 0));
+            if(lastDirection){
+                transform.Translate(new Vector2(speed * Time.deltaTime, 0));
+            }
+            else{
+                transform.Translate(new Vector2(-speed * Time.deltaTime, 0));
+            }
             dash = dash + 0.5f * Time.deltaTime;
             Debug.Log(dash);
             if(dash >= 0.3f){
