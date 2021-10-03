@@ -21,6 +21,8 @@ public class Megaman : MonoBehaviour
     SpriteRenderer myRenderer;
     BoxCollider2D myCollider;
     float layerTime = 2;
+    int jump;
+
     void Start()
     {
         myAnimator = GetComponent<Animator>();
@@ -76,6 +78,7 @@ public class Megaman : MonoBehaviour
         else
         {
             myAnimator.SetBool("running", false);
+
         }
     }
     void Saltar()
@@ -101,6 +104,18 @@ public class Megaman : MonoBehaviour
                 myAnimator.SetTrigger("takeof");
                 myAnimator.SetBool("jumping", true);
                 myBody.AddForce(new Vector2(0, jumpSpeed), ForceMode2D.Impulse);
+                jump = 1;
+            }
+
+        }
+        if (myAnimator.GetBool("jumping") && !isGrounded())
+        {
+            if (myAnimator.GetBool("jumping") && jump == 1 && Input.GetKeyDown(KeyCode.Space))
+            {
+                myAnimator.SetTrigger("takeof");
+                myAnimator.SetBool("jumping", true);
+                myBody.AddForce(new Vector2(0, jumpSpeed), ForceMode2D.Impulse);
+                jump = 0;
             }
         }
     }
