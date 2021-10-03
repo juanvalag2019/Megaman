@@ -28,7 +28,6 @@ public class BulletMegaman : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        Debug.Log(LayerMask.LayerToName(collision.gameObject.layer));
         myAnimator.SetBool("explode", true);
     }
 
