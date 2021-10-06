@@ -104,8 +104,10 @@ public class Megaman : MonoBehaviour
         {
             myAnimator.SetBool("falling", false);
             myAnimator.SetBool("jumping", false);
+            myAnimator.SetBool("grounded", true);
             if (Input.GetKeyDown(KeyCode.Space))
             {
+                myAnimator.SetBool("grounded", false);
                 myAnimator.SetTrigger("takeof");
                 myAnimator.SetBool("jumping", true);
                 if (myAnimator.GetBool("dash"))
