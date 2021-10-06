@@ -104,14 +104,18 @@ public class Megaman : MonoBehaviour
         {
             myAnimator.SetBool("falling", false);
             myAnimator.SetBool("jumping", false);
+            myAnimator.SetBool("grounded", true);
             if (Input.GetKeyDown(KeyCode.Space))
             {
+                myAnimator.SetBool("grounded", false);
                 myAnimator.SetTrigger("takeof");
                 myAnimator.SetBool("jumping", true);
-                if(myAnimator.GetBool("dash")){
-                    myBody.AddForce(new Vector2(0, jumpSpeed+ jumpSpeed/2), ForceMode2D.Impulse);
+                if (myAnimator.GetBool("dash"))
+                {
+                    myBody.AddForce(new Vector2(0, jumpSpeed + jumpSpeed / 2), ForceMode2D.Impulse);
                 }
-                else{
+                else
+                {
                     myBody.AddForce(new Vector2(0, jumpSpeed), ForceMode2D.Impulse);
                 }
                 jump = 1;
@@ -153,33 +157,39 @@ public class Megaman : MonoBehaviour
         }
     }
 
-    void Dash(){
+    void Dash()
+    {
 
-        if (Input.GetKey(KeyCode.Z) && dash <= 0.3 && pressZ == true){            
+        if (Input.GetKey(KeyCode.Z) && dash <= 0.3 && pressZ == true)
+        {
             myAnimator.SetBool("dash", true);
-            if(lastDirection){
+            if (lastDirection)
+            {
                 transform.Translate(new Vector2(speed * Time.deltaTime, 0));
             }
-            else{
+            else
+            {
                 transform.Translate(new Vector2(-speed * Time.deltaTime, 0));
             }
             dash = dash + 0.5f * Time.deltaTime;
-            Debug.Log(dash);
-            if(dash >= 0.3f){
+            if (dash >= 0.3f)
+            {
                 pressZ = false;
                 dash = 1;
             }
         }
-        else{
-            if(dash > 0){
-            dash = dash - 1 * Time.deltaTime;
-            Debug.Log(dash);
-            myAnimator.SetBool("dash", false);
+        else
+        {
+            if (dash > 0)
+            {
+                dash = dash - 1 * Time.deltaTime;
+                myAnimator.SetBool("dash", false);
             }
-            if(dash <= 0){
+            if (dash <= 0)
+            {
                 pressZ = true;
             }
-        }     
-        
+        }
+
     }
 }
